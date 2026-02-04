@@ -23,12 +23,24 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND WIN32)
     target_compile_options(${PROJECT_NAME} PRIVATE
         /W4
         /O2
-        /fp:fast
         /EHsc
-        -march=native
-        -Xclang -fopenmp
+        /clang:-march=native
+        /clang:-O3
+        /clang:-ffast-math
+        /clang:-fopenmp
     )
+    
+    get_filename_component(CLANG_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
+    set(OMP_DLL "${CLANG_BIN_DIR}/libomp.dll")
+    
     target_link_libraries(${PROJECT_NAME} PRIVATE libomp)
+
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${OMP_DLL}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        COMMENT "Copying libomp.dll"
+    )
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE
         -Wall -Wextra -Wpedantic
