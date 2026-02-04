@@ -1,6 +1,7 @@
 #include "engine.hpp"
 #include <omp.h>
 #include <cmath>
+#include <stdexcept>
 
 Engine::Engine(System *s) : s(s) {
     x = s->x.data();
@@ -64,11 +65,11 @@ void DirectForce::update() {
 BarnesHut::BarnesHut(System* s) : Engine(s) {}
 
 void BarnesHut::update() {
-
+    throw std::runtime_error("Barnes-Hut is not implemented");
 }
 
 FastMultipole::FastMultipole(System* s) : Engine(s) {}
 
 void FastMultipole::update() {
-    
+    throw std::runtime_error("Fast multipole method is not implemented");
 }
