@@ -7,8 +7,9 @@
     },
     "configurePresets": [
         {
-            "name": "default-gcc",
+            "name": "linux-gcc",
             "displayName": "Ninja Release (GCC)",
+            "description": "GCC for Linux",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
@@ -19,8 +20,9 @@
             }
         },
         {
-            "name": "default-clang",
+            "name": "linux-clang",
             "displayName": "Ninja Release (Clang)",
+            "description": "Clang for Linux",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
@@ -57,12 +59,12 @@
     ],
     "buildPresets": [
         {
-            "name": "default",
-            "configurePreset": "default-gcc"
+            "name": "linux-gcc",
+            "configurePreset": "linux-gcc"
         },
         {
-            "name": "clang",
-            "configurePreset": "default-clang"
+            "name": "linux-clang",
+            "configurePreset": "linux-clang"
         },
         {
             "name": "windows-clang",

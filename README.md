@@ -1,3 +1,37 @@
 # Graviton Engine
 
-This is an n-body simulation engine that tries to implement as many different algorithms. This is meant to be a test bed for testing. It is currently only able to run without a user interface and from the main.cpp file, but will later be converted to a shared object and used for an actual user interface with extra features.
+## About
+
+An n-body simulation engine made to learn and apply multiple different algorithms in C++.
+
+## Usage
+
+Currently, all of the different settings are inside the `main.hpp` file as macro definitions.
+
+## Compilation
+
+### Linux
+
+Make sure that GCC or LLVM is installed on your machine. It also requires OpenMP to be installed. To build, use:
+
+```sh
+cmake --preset linux-gcc                # Can replace with linux-clang or debug
+cmake --build --preset linux-gcc
+```
+
+### Windows
+
+Make sure LLVM is installed on your machine. There is no need to install OpenMP since it is already included with the LLVM installation.
+
+```powershell
+winget install -i LLVM.LLVM             # Install LLVM for Windows
+
+cmake --preset windows-clang            # Can replace with debug
+cmake --build --preset windows-clang
+```
+
+MSVC is not supported due to it having a much older OpenMP implementation that struggles with SIMD instructions and vectorization, therefore making it way too slow. On a test version of the code, the MSVC compiled binary was nearly three times slower.
+
+## Future
+
+The remaining empty classes for different initial conditions, physics engine, and ODE solvers will slowly be implemented. The goal in the end is for this project to become a library that can be used for different projects, but currently is still used as an exectuable for basic testing.
