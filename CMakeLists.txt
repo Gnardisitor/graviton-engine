@@ -23,8 +23,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND WIN32)
     target_compile_options(${PROJECT_NAME} PRIVATE
         /W4
         /O2
-        /openmp:llvm
+        /fp:fast
         /EHsc
+        -march=native
+        -Xclang -fopenmp
     )
     target_link_libraries(${PROJECT_NAME} PRIVATE libomp)
 else()
