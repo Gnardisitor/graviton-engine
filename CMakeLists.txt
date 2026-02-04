@@ -18,13 +18,23 @@ add_executable(${PROJECT_NAME} ${CORE_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/${INCLUDE_DIR})
 
-target_compile_options(${PROJECT_NAME} PRIVATE
-    -Wall -Wextra -Wpedantic
-    -O3
-    -ffast-math
-    -fopenmp
-    -march=native
-)
-
-find_package(OpenMP REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND WIN32)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        /W4
+        /O2
+        /openmp:llvm
+        /EHsc
+    )
+    target_link_libraries(${PROJECT_NAME} PRIVATE libomp)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -Wall -Wextra -Wpedantic
+        -O3
+        -ffast-math
+        -fopenmp
+        -march=native
+    )
+    find_package(OpenMP REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+endif()

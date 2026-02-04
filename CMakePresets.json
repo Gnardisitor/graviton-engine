@@ -31,6 +31,19 @@
             }
         },
         {
+            "name": "windows-clang",
+            "displayName": "Ninja Release (Clang-CL)",
+            "description": "MSVC-compatible Clang for Windows",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            }
+        },
+        {
             "name": "debug",
             "displayName": "Ninja Debug",
             "description": "Debug build using Ninja",
@@ -50,6 +63,10 @@
         {
             "name": "clang",
             "configurePreset": "default-clang"
+        },
+        {
+            "name": "windows-clang",
+            "configurePreset": "windows-clang"
         },
         {
             "name": "debug",
