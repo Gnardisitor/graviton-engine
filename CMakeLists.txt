@@ -22,33 +22,47 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES)
     target_compile_options(${PROJECT_NAME} PRIVATE
         /W4
-        /O2
         /EHsc
-        /clang:-march=native
-        /clang:-O3
-        /clang:-ffast-math
-        /clang:-fopenmp
     )
     
-    get_filename_component(CLANG_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
-    set(OMP_DLL "${CLANG_BIN_DIR}/libomp.dll")
-    
-    target_link_libraries(${PROJECT_NAME} PRIVATE libomp)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_options(${PROJECT_NAME} PRIVATE /O0)
+    else()
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            /O2
+            /clang:-march=native
+            /clang:-O3
+            /clang:-ffast-math
+            /clang:-fopenmp
+        )
+        
+        get_filename_component(CLANG_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
+        set(OMP_DLL "${CLANG_BIN_DIR}/libomp.dll")
+        
+        target_link_libraries(${PROJECT_NAME} PRIVATE libomp)
 
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${OMP_DLL}"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-        COMMENT "Copying libomp.dll"
-    )
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${OMP_DLL}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+            COMMENT "Copying libomp.dll"
+        )
+    endif()
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE
         -Wall -Wextra -Wpedantic
-        -O3
-        -ffast-math
-        -fopenmp
-        -march=native
     )
-    find_package(OpenMP REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+    
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_options(${PROJECT_NAME} PRIVATE -O0)
+    else()
+        target_compile_options(${PROJECT_NAME} PRIVATE
+            -O3
+            -ffast-math
+            -fopenmp
+            -march=native
+        )
+        find_package(OpenMP REQUIRED)
+        target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+    endif()
 endif()
