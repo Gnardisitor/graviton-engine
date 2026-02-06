@@ -207,12 +207,12 @@ void RK4::step(double h) {
 
     #pragma omp parallel for simd schedule(static)
     for (int i = 0; i < n; i++) {
-        double sum_kx = k1x[i] + 2.0*k2x[i] + 2.0*k3x[i] + k4x[i];
-        double sum_ky = k1y[i] + 2.0*k2y[i] + 2.0*k3y[i] + k4y[i];
-        double sum_kz = k1z[i] + 2.0*k2z[i] + 2.0*k3z[i] + k4z[i];
-        double sum_kvx = k1vx[i] + 2.0*k2vx[i] + 2.0*k3vx[i] + k4vx[i];
-        double sum_kvy = k1vy[i] + 2.0*k2vy[i] + 2.0*k3vy[i] + k4vy[i];
-        double sum_kvz = k1vz[i] + 2.0*k2vz[i] + 2.0*k3vz[i] + k4vz[i];
+        double sum_kx = std::fma(2.0, k2x[i], k1x[i]) + std::fma(2.0, k3x[i], k4x[i]);
+        double sum_ky = std::fma(2.0, k2y[i], k1y[i]) + std::fma(2.0, k3y[i], k4y[i]);
+        double sum_kz = std::fma(2.0, k2z[i], k1z[i]) + std::fma(2.0, k3z[i], k4z[i]);
+        double sum_kvx = std::fma(2.0, k2vx[i], k1vx[i]) + std::fma(2.0, k3vx[i], k4vx[i]);
+        double sum_kvy = std::fma(2.0, k2vy[i], k1vy[i]) + std::fma(2.0, k3vy[i], k4vy[i]);
+        double sum_kvz = std::fma(2.0, k2vz[i], k1vz[i]) + std::fma(2.0, k3vz[i], k4vz[i]);
         
         x[i] = std::fma(sixth, sum_kx, ytx[i]);
         y[i] = std::fma(sixth, sum_ky, yty[i]);

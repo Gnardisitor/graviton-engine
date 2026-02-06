@@ -6,7 +6,8 @@
 #include <iostream>
 
 int main() {
-    omp_set_num_threads(THREADS);
+    if (THREADS > 0) omp_set_num_threads(THREADS);
+
     std::cout << "Graviton test with " << COUNT << " bodies\n";
 
     auto start = std::chrono::high_resolution_clock::now();
