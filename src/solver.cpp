@@ -90,16 +90,16 @@ void VelocityVerlet::step(double h) {
         vx[i] = std::fma(ax[i], half, vx[i]);
         vy[i] = std::fma(ay[i], half, vy[i]);
         vz[i] = std::fma(az[i], half, vz[i]);
+
+        x[i] = std::fma(vx[i], h, x[i]);
+        y[i] = std::fma(vy[i], h, y[i]);
+        z[i] = std::fma(vz[i], h, z[i]);
     }
 
     s->update();
 
     #pragma omp parallel for simd schedule(static)
     for (int i = 0; i < n; i++) {
-        x[i] = std::fma(vx[i], h, x[i]);
-        y[i] = std::fma(vy[i], h, y[i]);
-        z[i] = std::fma(vz[i], h, z[i]);
-
         vx[i] = std::fma(ax[i], half, vx[i]);
         vy[i] = std::fma(ay[i], half, vy[i]);
         vz[i] = std::fma(az[i], half, vz[i]);
