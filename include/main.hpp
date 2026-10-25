@@ -2,7 +2,7 @@
 
 #define SOLVER  SOLVER_POSITION_VERLET
 #define ENGINE  ENGINE_DIRECT_FORCE
-#define COUNT   1000
+#define COUNT   5000
 #define TIME    1000.0
 #define STEP    0.1
 

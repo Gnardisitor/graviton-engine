@@ -97,13 +97,6 @@ void System::run(double t, double h) {
     for (int i = 0; i < steps; i++) step(h);
 }
 
-double Cluster::getX() {
-    return dist(gen);
-}
-
-thread_local std::mt19937 Cluster::gen;
-thread_local std::uniform_real_distribution<double> Cluster::dist{0.0, 1.0};
-
 Cluster::Cluster(SolverType s, EngineType e, int n) : System(s, e, n) {
     double mass = 1.0 / n;
 
@@ -113,8 +106,12 @@ Cluster::Cluster(SolverType s, EngineType e, int n) : System(s, e, n) {
     for (int i = 0; i < n; i++) {
         m[i] = mass;
 
+        std::mt19937 gen(static_cast<std::mt19937::result_type>(i) + 1u);
+        std::uniform_real_distribution<double> dist(0.0, 1.0);
+        auto getX = [&]() { return dist(gen); };
+
         double x1 = getX();
-        double r = 1.0 * std::sqrt(1.0 / (std::cbrt(x1 * x1) - 1.0));
+        double r = 1.0 / std::sqrt(1.0 / std::cbrt(x1 * x1) - 1.0);
 
         double x2 = getX(), x3 = getX();
         z[i] = (1.0 - 2.0 * x2) * r;
@@ -129,7 +126,7 @@ Cluster::Cluster(SolverType s, EngineType e, int n) : System(s, e, n) {
             q = getX();
             g = q * q * std::pow(1.0 - q * q, 3.5);
         } while(0.1 * getX() >= g);
-        
+
         double v = ve * q;
         double x6 = getX(), x7 = getX();
         vz[i] = (1.0 - 2.0 * x6) * v;

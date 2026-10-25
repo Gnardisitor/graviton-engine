@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
 
     if (solverType == SOLVER_RK45) return 1;
     bool passed = testSolver(solverType);
-    
+
     if (passed) return 0;
     return 1;
 }

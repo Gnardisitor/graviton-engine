@@ -32,7 +32,7 @@ void DirectForce::update() {
 
             double r = 1.0 / std::sqrt(dx * dx + dy * dy + dz * dz);
             double d = r * r * r;
-            
+
             double f = m[j] * d;
 
             lax = std::fma(dx, f, lax);
@@ -48,7 +48,7 @@ void DirectForce::update() {
 
             double r = 1.0 / std::sqrt(dx * dx + dy * dy + dz * dz);
             double d = r * r * r;
-            
+
             double f = m[j] * d;
 
             lax = std::fma(dx, f, lax);

@@ -38,19 +38,18 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE
         -O3
         -ffast-math
-        -fopenmp
         -march=native
     )
     target_compile_options(graviton_engine PRIVATE
         -O3
         -ffast-math
-        -fopenmp
         -march=native
     )
-    find_package(OpenMP REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
-    target_link_libraries(graviton_engine PRIVATE OpenMP::OpenMP_CXX)
 endif()
+
+find_package(OpenMP REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(graviton_engine PRIVATE OpenMP::OpenMP_CXX)
 
 enable_testing()
 
@@ -61,10 +60,9 @@ target_link_libraries(graviton_test PRIVATE graviton_engine)
 target_compile_options(graviton_test PRIVATE -Wall -Wextra -Wpedantic)
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(graviton_test PRIVATE -O3 -fopenmp -march=native)
-    find_package(OpenMP REQUIRED)
-    target_link_libraries(graviton_test PRIVATE OpenMP::OpenMP_CXX)
+    target_compile_options(graviton_test PRIVATE -O3 -march=native)
 endif()
+target_link_libraries(graviton_test PRIVATE OpenMP::OpenMP_CXX)
 
 add_test(NAME Euler COMMAND graviton_test 0)
 add_test(NAME CauchyEuler COMMAND graviton_test 1)

@@ -71,7 +71,7 @@ void PositionVerlet::step(double h) {
         vy[i] = std::fma(ay[i], h, vy[i]);
         vz[i] = std::fma(az[i], h, vz[i]);
 
-        
+
         x[i] = std::fma(vx[i], half, x[i]);
         y[i] = std::fma(vy[i], half, y[i]);
         z[i] = std::fma(vz[i], half, z[i]);
@@ -156,7 +156,7 @@ void RK4::f(std::vector<double>& kx, std::vector<double>& ky, std::vector<double
 void RK4::step(double h) {
     double half = 0.5 * h;
     double sixth = h / 6.0;
-    
+
     #pragma omp parallel for simd schedule(static)
     for (int i = 0; i < n; i++) {
         ytx[i] = x[i];
@@ -166,7 +166,7 @@ void RK4::step(double h) {
         ytvy[i] = vy[i];
         ytvz[i] = vz[i];
     }
-    
+
     f(k1x, k1y, k1z, k1vx, k1vy, k1vz);
 
     #pragma omp parallel for simd schedule(static)
@@ -178,7 +178,7 @@ void RK4::step(double h) {
         vy[i] = std::fma(k1vy[i], half, ytvy[i]);
         vz[i] = std::fma(k1vz[i], half, ytvz[i]);
     }
-    
+
     f(k2x, k2y, k2z, k2vx, k2vy, k2vz);
 
     #pragma omp parallel for simd schedule(static)
@@ -190,7 +190,7 @@ void RK4::step(double h) {
         vy[i] = std::fma(k2vy[i], half, ytvy[i]);
         vz[i] = std::fma(k2vz[i], half, ytvz[i]);
     }
-    
+
     f(k3x, k3y, k3z, k3vx, k3vy, k3vz);
 
     #pragma omp parallel for simd schedule(static)
@@ -202,7 +202,7 @@ void RK4::step(double h) {
         vy[i] = std::fma(k3vy[i], h, ytvy[i]);
         vz[i] = std::fma(k3vz[i], h, ytvz[i]);
     }
-    
+
     f(k4x, k4y, k4z, k4vx, k4vy, k4vz);
 
     #pragma omp parallel for simd schedule(static)
@@ -213,7 +213,7 @@ void RK4::step(double h) {
         double sum_kvx = std::fma(2.0, k2vx[i], k1vx[i]) + std::fma(2.0, k3vx[i], k4vx[i]);
         double sum_kvy = std::fma(2.0, k2vy[i], k1vy[i]) + std::fma(2.0, k3vy[i], k4vy[i]);
         double sum_kvz = std::fma(2.0, k2vz[i], k1vz[i]) + std::fma(2.0, k3vz[i], k4vz[i]);
-        
+
         x[i] = std::fma(sixth, sum_kx, ytx[i]);
         y[i] = std::fma(sixth, sum_ky, yty[i]);
         z[i] = std::fma(sixth, sum_kz, ytz[i]);
@@ -233,67 +233,68 @@ PEFRL::PEFRL(System* s) : Solver(s) {}
 
 void PEFRL::step(double h) {
     double half = 0.5 * h;
-    double v1 = XI * h;
-    double v2 = V1 * half;
-    double v3 = LAMBDA * h;
-    double v4 = V2 * half;
-    
+    double d1 = XI * h;
+    double d2 = CHI * h;
+    double d3 = V2 * h;
+    double k1 = V1 * half;
+    double k2 = LAMBDA * h;
+
     #pragma omp parallel for simd schedule(static)
     for (int i = 0; i < n; i++) {
-        x[i] = std::fma(vx[i], v1, x[i]);
-        y[i] = std::fma(vy[i], v1, y[i]);
-        z[i] = std::fma(vz[i], v1, z[i]);
+        x[i] = std::fma(vx[i], d1, x[i]);
+        y[i] = std::fma(vy[i], d1, y[i]);
+        z[i] = std::fma(vz[i], d1, z[i]);
     }
 
     s->update();
 
     #pragma omp parallel for simd schedule(static)
     for (int i = 0; i < n; i++) {
-        vx[i] = std::fma(ax[i], v2, vx[i]);
-        vy[i] = std::fma(ay[i], v2, vy[i]);
-        vz[i] = std::fma(az[i], v2, vz[i]);
+        vx[i] = std::fma(ax[i], k1, vx[i]);
+        vy[i] = std::fma(ay[i], k1, vy[i]);
+        vz[i] = std::fma(az[i], k1, vz[i]);
 
-        x[i] = std::fma(vx[i], v1, x[i]);
-        y[i] = std::fma(vy[i], v1, y[i]);
-        z[i] = std::fma(vz[i], v1, z[i]);
+        x[i] = std::fma(vx[i], d2, x[i]);
+        y[i] = std::fma(vy[i], d2, y[i]);
+        z[i] = std::fma(vz[i], d2, z[i]);
     }
 
     s->update();
 
     #pragma omp parallel for simd schedule(static)
     for (int i = 0; i < n; i++) {
-        vx[i] = std::fma(ax[i], v3, vx[i]);
-        vy[i] = std::fma(ay[i], v3, vy[i]);
-        vz[i] = std::fma(az[i], v3, vz[i]);
+        vx[i] = std::fma(ax[i], k2, vx[i]);
+        vy[i] = std::fma(ay[i], k2, vy[i]);
+        vz[i] = std::fma(az[i], k2, vz[i]);
 
-        x[i] = std::fma(vx[i], v4, x[i]);
-        y[i] = std::fma(vy[i], v4, y[i]);
-        z[i] = std::fma(vz[i], v4, z[i]);
+        x[i] = std::fma(vx[i], d3, x[i]);
+        y[i] = std::fma(vy[i], d3, y[i]);
+        z[i] = std::fma(vz[i], d3, z[i]);
     }
 
     s->update();
 
     #pragma omp parallel for simd schedule(static)
     for (int i = 0; i < n; i++) {
-        vx[i] = std::fma(ax[i], v3, vx[i]);
-        vy[i] = std::fma(ay[i], v3, vy[i]);
-        vz[i] = std::fma(az[i], v3, vz[i]);
+        vx[i] = std::fma(ax[i], k2, vx[i]);
+        vy[i] = std::fma(ay[i], k2, vy[i]);
+        vz[i] = std::fma(az[i], k2, vz[i]);
 
-        x[i] = std::fma(vx[i], v1, x[i]);
-        y[i] = std::fma(vy[i], v1, y[i]);
-        z[i] = std::fma(vz[i], v1, z[i]);
+        x[i] = std::fma(vx[i], d2, x[i]);
+        y[i] = std::fma(vy[i], d2, y[i]);
+        z[i] = std::fma(vz[i], d2, z[i]);
     }
 
     s->update();
 
     #pragma omp parallel for simd schedule(static)
     for (int i = 0; i < n; i++) {
-        vx[i] = std::fma(ax[i], v2, vx[i]);
-        vy[i] = std::fma(ay[i], v2, vy[i]);
-        vz[i] = std::fma(az[i], v2, vz[i]);
+        vx[i] = std::fma(ax[i], k1, vx[i]);
+        vy[i] = std::fma(ay[i], k1, vy[i]);
+        vz[i] = std::fma(az[i], k1, vz[i]);
 
-        x[i] = std::fma(vx[i], v1, x[i]);
-        y[i] = std::fma(vy[i], v1, y[i]);
-        z[i] = std::fma(vz[i], v1, z[i]);
+        x[i] = std::fma(vx[i], d1, x[i]);
+        y[i] = std::fma(vy[i], d1, y[i]);
+        z[i] = std::fma(vz[i], d1, z[i]);
     }
 }

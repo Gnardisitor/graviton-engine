@@ -50,12 +50,6 @@ class System {
 };
 
 class Cluster : public System {
-    private:
-    static thread_local std::mt19937 gen;
-    static thread_local std::uniform_real_distribution<double> dist;
-
-    double getX();
-
     public:
     Cluster(SolverType s, EngineType e, int n);
     void runStats(double t, double h);

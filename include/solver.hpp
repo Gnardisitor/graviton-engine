@@ -70,7 +70,7 @@ class PEFRL : public Solver {
     static constexpr double CHI = -0.6626458266981849e-1;
     static constexpr double V1 = 1.0 - 2.0 * LAMBDA;
     static constexpr double V2 = 1.0 - 2.0 * (CHI + XI);
-    
+
     public:
     PEFRL(System* s);
     void step(double h);
